@@ -12,6 +12,8 @@ import 'package:wallet_services/screens/add_amount_send.dart';
 import 'package:wallet_services/screens/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:wallet_services/screens/profile_page.dart';
+import 'package:wallet_services/screens/select_destiny_page.dart';
 import 'package:wallet_services/widgets/fab/action_button.dart';
 import 'package:wallet_services/widgets/fab/expandable_fab.dart';
 
@@ -107,15 +109,6 @@ class _HomeState extends State<Home> {
     });
   }
 
-  void _logOut() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('user');
-    prefs.setString('username', username!);
-    prefs.setString('fullname', fullname!);
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (c) => const Login()));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,7 +116,17 @@ class _HomeState extends State<Home> {
         title: Text('¡Hola, $fullname!'),
         backgroundColor: const Color(0xffF3AB0D),
         actions: <Widget>[
-          IconButton(icon: const Icon(Icons.logout), onPressed: _logOut)
+          //IconButton(icon: const Icon(Icons.logout), onPressed: _logOut),
+          IconButton(
+              icon: const Icon(Icons.person),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ),
+                );
+              })
         ],
       ),
       body: Center(
@@ -178,7 +181,7 @@ class _HomeState extends State<Home> {
         ),
       ),
       floatingActionButton: ExpandableFab(
-        distance: 50.0,
+        distance: 100.0,
         children: [
           ActionButton(
             tooltipp: 'PAGAR',
@@ -203,7 +206,8 @@ class _HomeState extends State<Home> {
 
                 SharedPreferences prefs = await SharedPreferences.getInstance();
 
-                processTransfer(stringToBase64.decode(bussines),prefs.getString("id")!, stringToBase64.decode(amount));
+                processTransfer(stringToBase64.decode(bussines),
+                    prefs.getString("id")!, stringToBase64.decode(amount));
               } else {
                 String bussines = parts[0];
                 print("BUSSINESS: " + stringToBase64.decode(bussines));
@@ -231,6 +235,18 @@ class _HomeState extends State<Home> {
               )
             },
             icon: const Icon(Icons.arrow_downward),
+          ),
+          ActionButton(
+            tooltipp: 'ENVIAR POR TELEFONO',
+            onPressed: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SelectDestinyPage(),
+                ),
+              )
+            },
+            icon: const Icon(Icons.phone),
           ),
         ],
       ),

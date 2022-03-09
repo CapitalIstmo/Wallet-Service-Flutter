@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:cool_alert/cool_alert.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:wallet_services/const/endpoints.dart';
 import 'package:wallet_services/models/response_error_login.dart';
+import 'package:wallet_services/models/response_error_register.dart';
 import 'package:wallet_services/models/response_login.dart';
 import 'package:wallet_services/models/response_register.dart';
 import 'package:wallet_services/screens/home.dart';
@@ -35,6 +38,8 @@ class _RegisterState extends State<Register> {
   }
 
   String myValueSelected = "";
+
+  CountryCode? myPhoneCodeSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -93,21 +98,54 @@ class _RegisterState extends State<Register> {
                         ),
                         Container(
                           margin: const EdgeInsets.only(top: 10),
-                          child: TextField(
-                            textInputAction: TextInputAction.next,
-                            keyboardType: TextInputType.phone,
-                            obscureText: false,
-                            controller: _phone,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.person_outline,
-                                size: 20,
+                          child: Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.grey.shade500),
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(5),
+                                  ),
+                                ),
+                                width: 100,
+                                margin: const EdgeInsets.only(right: 10),
+                                child: CountryCodePicker(
+                                  onChanged: (_) {
+                                    setState(() {
+                                      myPhoneCodeSelected = _;
+                                    });
+                                  },
+                                  //initialSelection: 'MX',
+                                  favorite: const ['+52', 'MX'],
+                                  showCountryOnly: false,
+                                  alignLeft: false,
+                                  padding: const EdgeInsets.all(1.0),
+                                ),
                               ),
-                              hintText: 'Phone',
-                              contentPadding:
-                                  EdgeInsets.only(bottom: 8.0, top: 8.0),
-                              border: OutlineInputBorder(),
-                            ),
+                              SizedBox(
+                                width: 201,
+                                child: TextField(
+                                  textInputAction: TextInputAction.next,
+                                  keyboardType: TextInputType.phone,
+                                  obscureText: false,
+                                  controller: _phone,
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(10),
+                                  ],
+                                  decoration: const InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.person_outline,
+                                      size: 20,
+                                    ),
+                                    hintText: 'Phone',
+                                    contentPadding:
+                                        EdgeInsets.only(bottom: 8.0, top: 8.0),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Container(
@@ -130,7 +168,6 @@ class _RegisterState extends State<Register> {
                         Container(
                           margin: const EdgeInsets.only(top: 10),
                           child: DropdownButtonFormField(
-                            
                             decoration: const InputDecoration(
                               prefixIcon: Icon(
                                 Icons.lock_outline,
@@ -232,17 +269,21 @@ class _RegisterState extends State<Register> {
         setState(() {
           isLoading = true;
         });
-        processRegister(_username.text, _pass.text, _name.text, _phone.text, myValueSelected);
+
+        String? code = myPhoneCodeSelected?.dialCode;
+
+        processRegister(_username.text, _pass.text, _name.text,
+            "${code}${_phone.text}", myValueSelected);
       } else {
         CoolAlert.show(
-        context: context,
-        type: CoolAlertType.warning,
-        text: "Parece que las contraseñas no coinciden...",
-        title: "Campos Vacios",
-      );
-      setState(() {
-        isLoading = false;
-      });
+          context: context,
+          type: CoolAlertType.warning,
+          text: "Parece que las contraseñas no coinciden...",
+          title: "Campos Vacios",
+        );
+        setState(() {
+          isLoading = false;
+        });
       }
     } else {
       CoolAlert.show(
@@ -299,10 +340,19 @@ class _RegisterState extends State<Register> {
           MaterialPageRoute(builder: (context) => const Home()),
           (Route<dynamic> route) => false);
     } else {
+      ResponseErrorRegister incorrecto =
+          ResponseErrorRegister.fromJson(jsonDecode(response.body));
+
+      String errores = "";
+
+      for (var error in incorrecto.error) {
+        errores += "$error \n";
+      }
+
       CoolAlert.show(
         context: context,
         type: CoolAlertType.error,
-        text: 'Parece que algo salió mal...',
+        text: errores,
         title: "Registro Incorrecto",
       );
     }

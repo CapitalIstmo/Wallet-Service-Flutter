@@ -45,6 +45,12 @@ dependencies:
 
   qr_flutter: ^4.0.0
 
+  country_code_picker: ^2.0.2
+
+  contacts_service: ^0.6.3
+
+  permission_handler: ^9.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
