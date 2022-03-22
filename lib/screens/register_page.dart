@@ -26,6 +26,7 @@ class _RegisterState extends State<Register> {
   final TextEditingController _pass2 = TextEditingController();
   final TextEditingController _name = TextEditingController();
   final TextEditingController _phone = TextEditingController();
+  final TextEditingController _numberCedula = TextEditingController();
   bool isLoading = false;
 
   List<DropdownMenuItem<String>> get misTypeDocs {
@@ -33,6 +34,7 @@ class _RegisterState extends State<Register> {
       const DropdownMenuItem(child: Text("TIPO DE DOCUMENTO"), value: ""),
       const DropdownMenuItem(child: Text("CEDULA"), value: "CEDULA"),
       const DropdownMenuItem(child: Text("PASAPORTE"), value: "PASAPORTE"),
+      const DropdownMenuItem(child: Text("NIF"), value: "NIF"),
     ];
     return menuItems;
   }
@@ -40,6 +42,8 @@ class _RegisterState extends State<Register> {
   String myValueSelected = "";
 
   CountryCode? myPhoneCodeSelected;
+
+  bool visibleNomDoc = false;
 
   @override
   Widget build(BuildContext context) {
@@ -99,32 +103,32 @@ class _RegisterState extends State<Register> {
                         Container(
                           margin: const EdgeInsets.only(top: 10),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  border:
-                                      Border.all(color: Colors.grey.shade500),
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(5),
+                              Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 2),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade500),
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(5),
+                                    ),
+                                  ),
+                                  child: CountryCodePicker(
+                                    onChanged: (_) {
+                                      setState(() {
+                                        myPhoneCodeSelected = _;
+                                      });
+                                    },
+                                    //initialSelection: 'MX',
+                                    favorite: const ['+52', 'MX'],
+                                    showCountryOnly: false,
+                                    padding: EdgeInsets.all(0),
                                   ),
                                 ),
-                                width: 100,
-                                margin: const EdgeInsets.only(right: 10),
-                                child: CountryCodePicker(
-                                  onChanged: (_) {
-                                    setState(() {
-                                      myPhoneCodeSelected = _;
-                                    });
-                                  },
-                                  //initialSelection: 'MX',
-                                  favorite: const ['+52', 'MX'],
-                                  showCountryOnly: false,
-                                  alignLeft: false,
-                                  padding: const EdgeInsets.all(1.0),
-                                ),
                               ),
-                              SizedBox(
-                                width: 201,
+                              Expanded(
                                 child: TextField(
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.phone,
@@ -135,7 +139,7 @@ class _RegisterState extends State<Register> {
                                   ],
                                   decoration: const InputDecoration(
                                     prefixIcon: Icon(
-                                      Icons.person_outline,
+                                      Icons.phone,
                                       size: 20,
                                     ),
                                     hintText: 'Phone',
@@ -182,10 +186,39 @@ class _RegisterState extends State<Register> {
                             onChanged: (_) {
                               setState(() {
                                 myValueSelected = _.toString();
+
+                                if (myValueSelected != "") {
+                                  visibleNomDoc = true;
+                                } else {
+                                  visibleNomDoc = false;
+                                }
                               });
                             },
                             value: myValueSelected,
                             items: misTypeDocs,
+                          ),
+                        ),
+                        Visibility(
+                          visible: visibleNomDoc,
+                          child: Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            child: TextField(
+                              textInputAction: TextInputAction.next,
+                              controller: _numberCedula,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(
+                                  Icons.numbers,
+                                  size: 20,
+                                ),
+                                hintText: myValueSelected == "CEDULA"
+                                    ? 'Ingrese el No.'
+                                    : 'Ingrese el No.',
+                                contentPadding: const EdgeInsets.only(
+                                    bottom: 8.0, top: 8.0),
+                                border: const OutlineInputBorder(),
+                              ),
+                            ),
                           ),
                         ),
                         Container(
@@ -264,7 +297,7 @@ class _RegisterState extends State<Register> {
   Future<void> _register() async {
     if (_username.text.isNotEmpty &&
         _pass.text.isNotEmpty &&
-        _name.text.isNotEmpty) {
+        _name.text.isNotEmpty && _phone.text.isNotEmpty && myValueSelected.isNotEmpty && _numberCedula.text.isNotEmpty) {
       if (_pass.text == _pass2.text) {
         setState(() {
           isLoading = true;
@@ -273,7 +306,7 @@ class _RegisterState extends State<Register> {
         String? code = myPhoneCodeSelected?.dialCode;
 
         processRegister(_username.text, _pass.text, _name.text,
-            "${code}${_phone.text}", myValueSelected);
+            "${code}${_phone.text}", myValueSelected, _numberCedula.text);
       } else {
         CoolAlert.show(
           context: context,
@@ -298,14 +331,15 @@ class _RegisterState extends State<Register> {
     }
   }
 
-  processRegister(email, password, name, phone, type_doc) async {
+  processRegister(email, password, name, phone, type_doc, numeral) async {
     Map data = {
       'email': email,
       'password': password,
       'name': name,
       'phone': phone,
       'type_doc': type_doc,
-      'type_user': 'U'
+      'type_user': 'U',
+      'numeral': numeral
     };
 
     print(data.toString());

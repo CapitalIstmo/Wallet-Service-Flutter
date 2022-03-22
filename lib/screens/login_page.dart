@@ -65,6 +65,7 @@ class _LoginState extends State<Login> {
                         TextField(
                           keyboardType: TextInputType.emailAddress,
                           controller: _username,
+                          textInputAction: TextInputAction.next,
                           decoration: const InputDecoration(
                               prefixIcon: Icon(
                                 Icons.email,

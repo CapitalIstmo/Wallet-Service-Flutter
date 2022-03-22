@@ -35,8 +35,9 @@ class _ProfilePageState extends State<ProfilePage> {
     prefs.remove('user');
     prefs.setString('username', username!);
     prefs.setString('fullname', fullname!);
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (c) => const Login()));
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => Login()),
+        (Route<dynamic> route) => false);
   }
 
   @override

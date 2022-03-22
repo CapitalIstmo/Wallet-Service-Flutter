@@ -106,31 +106,31 @@ class _SelectDestinyPageState extends State<SelectDestinyPage> {
                   Container(
                     margin: const EdgeInsets.only(top: 10),
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade500),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(5),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.only(right: 2),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade500),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(5),
+                              ),
+                            ),
+                            child: CountryCodePicker(
+                              onChanged: (_) {
+                                setState(() {
+                                  myPhoneCodeSelected = _;
+                                });
+                              },
+                              //initialSelection: 'MX',
+                              favorite: const ['+52', 'MX'],
+                              showCountryOnly: false,
+                              padding: EdgeInsets.all(0),
                             ),
                           ),
-                          width: 100,
-                          margin: const EdgeInsets.only(right: 10),
-                          child: CountryCodePicker(
-                            onChanged: (_) {
-                              setState(() {
-                                myPhoneCodeSelected = _;
-                              });
-                            },
-                            //initialSelection: 'MX',
-                            favorite: const ['+52', 'MX'],
-                            showCountryOnly: false,
-                            alignLeft: false,
-                            padding: const EdgeInsets.all(1.0),
-                          ),
                         ),
-                        SizedBox(
-                          width: 201,
+                        Expanded(
                           child: TextField(
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.phone,
@@ -141,7 +141,7 @@ class _SelectDestinyPageState extends State<SelectDestinyPage> {
                             ],
                             decoration: const InputDecoration(
                               prefixIcon: Icon(
-                                Icons.person_outline,
+                                Icons.phone,
                                 size: 20,
                               ),
                               hintText: 'Phone',
@@ -181,8 +181,9 @@ class _SelectDestinyPageState extends State<SelectDestinyPage> {
                       onPressed: () async {
                         if (_phone.text.isNotEmpty && _amount.text.isNotEmpty) {
                           String? code = myPhoneCodeSelected?.dialCode;
-                          
-                          processTransfer("${code}${_phone.text}", _amount.text);
+
+                          processTransfer(
+                              "${code}${_phone.text}", _amount.text);
                         } else {
                           CoolAlert.show(
                             context: context,
