@@ -21,5 +21,10 @@ class Endpoints {
   static String generate_order_pay =
       baseUrl + "api/v1/transactions/makeOrderPay";
 
-        static String make_transfer_by_phone = baseUrl + "api/v1/transactions/makeTransferByPhone";
+  static String make_transfer_by_phone =
+      baseUrl + "api/v1/transactions/makeTransferByPhone";
+
+  static String get_info_user = baseUrl + "api/v1/users/getUser";
+
+  static String editarPerfil = baseUrl + "api/v1/users/editarPerfil";
 }

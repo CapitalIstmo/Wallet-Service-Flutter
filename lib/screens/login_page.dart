@@ -184,11 +184,15 @@ class _LoginState extends State<Login> {
           ResponseLogin.fromJson(jsonDecode(response.body));
 
       prefs.setBool('user', true);
+      prefs.setString('token', correcto.token!);
       prefs.setString('id', "${correcto.data!.id}");
+      prefs.setString('fullname', correcto.data!.name!);
       prefs.setString('username', correcto.data!.email!);
       prefs.setString('typeUser', correcto.data!.typeUser!);
-      prefs.setString('token', correcto.token!);
-      prefs.setString('fullname', correcto.data!.name!);
+      prefs.setString('phone', correcto.data!.phone!);
+      prefs.setString('typeDoc', correcto.data!.typeDoc!);
+      prefs.setString('numeral', correcto.data!.numeral!);
+      prefs.setString('phoneCode', correcto.data!.phoneCode!);
 
       Navigator.pushReplacement(
         context,

@@ -366,7 +366,6 @@ class _RegisterState extends State<Register> {
       prefs.setBool('user', true);
       prefs.setString('id', "${correcto.data!.id}");
       prefs.setString('username', correcto.data!.email!);
-      prefs.setString('typeUser', 'U');
       prefs.setString('token', correcto.token!);
       prefs.setString('fullname', correcto.data!.name!);
 
